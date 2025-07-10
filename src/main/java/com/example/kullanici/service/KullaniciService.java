@@ -1,0 +1,19 @@
+package com.example.kullanici.service;
+
+import com.example.kullanici.model.Kullanici;
+import com.example.kullanici.repository.KullaniciRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class KullaniciService {
+
+    private final KullaniciRepository repository;
+
+    public KullaniciService(KullaniciRepository repository) {
+        this.repository = repository;
+    }
+
+    public Kullanici kaydet(Kullanici kullanici) {
+        return repository.save(kullanici);
+    }
+}
