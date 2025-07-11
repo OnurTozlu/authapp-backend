@@ -25,7 +25,7 @@ public class Kullanici {
     private String mail;
 
     @Column(length = 10, nullable = false, unique = true)
-    private Integer numara;
+    private String numara;
 
 
     // Getter ve Setter'lar
@@ -79,11 +79,11 @@ public class Kullanici {
         this.mail = mail;
     }
 
-    public Integer getNumara() {
+    public String  getNumara() {
         return numara;
     }
 
-    public void setNumara(Integer numara) {
+    public void setNumara(String numara) {
         this.numara = numara;
     }
 }
