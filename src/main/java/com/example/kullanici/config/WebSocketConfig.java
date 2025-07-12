@@ -12,14 +12,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")  // WebSocket endpoint’i
-                .setAllowedOrigins("http://localhost:3000")  // Her yerden erişime izin
-                .withSockJS();  // SockJS fallback desteği
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("http://localhost:3000")  // frontend URL
+                .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic");  // Client’a mesaj gönderirken bu prefix kullanılır
-        registry.setApplicationDestinationPrefixes("/app");  // Client’ın server’a mesaj göndereceği prefix
+        registry.enableSimpleBroker("/topic");
+        registry.setApplicationDestinationPrefixes("/app");
     }
 }

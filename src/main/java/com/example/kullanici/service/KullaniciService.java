@@ -15,23 +15,28 @@ public class KullaniciService {
         this.repository = repository;
     }
 
+    // Kullanıcıyı kaydeder
     public Kullanici kaydet(Kullanici kullanici) {
         return repository.save(kullanici);
     }
 
+    // Kullanıcı adı ve şifreyle giriş kontrolü yapar
     public Optional<Kullanici> girisKontrol(String kullaniciAdi, String sifre) {
         return repository.findByKullaniciAdiAndSifre(kullaniciAdi, sifre);
     }
 
+    // ID ile kullanıcıyı getirir
     public Kullanici kullaniciGetir(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı: " + id));
     }
 
+    // Kullanıcı adına göre kullanıcıyı getirir
     public Optional<Kullanici> kullaniciBul(String kullaniciAdi) {
         return repository.findByKullaniciAdi(kullaniciAdi);
     }
 
+    // Belirtilen ID'ye sahip kullanıcı var mı kontrol eder
     public boolean kullaniciVarMi(Long id) {
         return repository.existsById(id);
     }
