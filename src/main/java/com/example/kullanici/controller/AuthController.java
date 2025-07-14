@@ -1,8 +1,10 @@
 package com.example.kullanici.controller;
 
+
 import com.example.kullanici.model.AuthRequest;
 import com.example.kullanici.model.AuthResponse;
 import com.example.kullanici.model.Kullanici;
+import com.example.kullanici.model.LoginResponse;
 import com.example.kullanici.repository.KullaniciRepository;
 import com.example.kullanici.security.JwtUtil;
 import com.example.kullanici.security.TokenBlacklist;
@@ -34,7 +36,7 @@ public class AuthController {
             Kullanici kullanici = optionalKullanici.get();
             if (kullanici.getSifre().equals(request.getSifre())) {
                 String token = jwtUtil.generateToken(kullanici.getKullaniciAdi());
-                return ResponseEntity.ok(new AuthResponse(token));
+                return ResponseEntity.ok(new LoginResponse(token, kullanici));
             }
         }
 
@@ -54,4 +56,5 @@ public class AuthController {
         }
         return ResponseEntity.badRequest().body("Token header bulunamadı");
     }
+
 }
