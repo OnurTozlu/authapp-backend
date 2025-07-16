@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 @Entity
 public class Arkadas {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

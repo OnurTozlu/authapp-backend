@@ -5,6 +5,7 @@ import com.example.kullanici.model.ArkadaslikDurumu;
 import com.example.kullanici.model.Kullanici;
 import com.example.kullanici.repository.ArkadasRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -16,6 +17,7 @@ public class ArkadasService {
         this.arkadasRepository = arkadasRepository;
     }
 
+    // Arkadaşlık isteği gönder
     public Arkadas arkadaslikIsteğiGonder(Kullanici gonderen, Kullanici alan) {
         Arkadas arkadas = new Arkadas();
         arkadas.setIstekGonderen(gonderen);
@@ -24,13 +26,22 @@ public class ArkadasService {
         return arkadasRepository.save(arkadas);
     }
 
+    // Kullanıcının tüm arkadaşlıklarını getir (durumu KABUL_EDILDI olanlar)
     public List<Arkadas> kullanicininTumArkadasliklari(Kullanici kullanici) {
         return arkadasRepository.findByIstekAlanOrIstekGonderen(kullanici, kullanici);
     }
 
-    public void arkadaslikDurumunuGuncelle(Long arkadasId, ArkadaslikDurumu yeniDurum) {
-        Arkadas arkadas = arkadasRepository.findById(arkadasId).orElseThrow();
-        arkadas.setDurum(yeniDurum);
-        arkadasRepository.save(arkadas);
+    // Arkadaşlık durumunu güncelle (KABUL, RED vs)
+    public boolean arkadaslikDurumunuGuncelle(Long arkadasId, ArkadaslikDurumu yeniDurum) {
+        return arkadasRepository.findById(arkadasId).map(arkadas -> {
+            arkadas.setDurum(yeniDurum);
+            arkadasRepository.save(arkadas);
+            return true;
+        }).orElse(false);
+    }
+
+    // Bekleyen (durum = BEKLIYOR) arkadaşlık isteklerini getir
+    public List<Arkadas> bekleyenIstekleriGetir(Kullanici kullanici) {
+        return arkadasRepository.findByIstekAlanAndDurumKod(kullanici, ArkadaslikDurumu.BEKLIYOR.getKod());
     }
 }

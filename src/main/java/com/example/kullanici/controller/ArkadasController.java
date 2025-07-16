@@ -1,16 +1,18 @@
 package com.example.kullanici.controller;
 
 import com.example.kullanici.DTO.ArkadasDTO;
+import com.example.kullanici.DTO.ArkadasIstekDTO;
 import com.example.kullanici.model.Arkadas;
 import com.example.kullanici.model.ArkadaslikDurumu;
 import com.example.kullanici.model.Kullanici;
 import com.example.kullanici.service.ArkadasService;
 import com.example.kullanici.service.KullaniciService;
-import com.example.kullanici.security.JwtUtil; // JwtUtil's import etmeyi unutma
+import com.example.kullanici.security.JwtUtil;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/arkadas")
@@ -18,7 +20,7 @@ public class ArkadasController {
 
     private final ArkadasService arkadasService;
     private final KullaniciService kullaniciService;
-    private final JwtUtil jwtUtil;  // JWT Token işleme sınıfı
+    private final JwtUtil jwtUtil;
 
     public ArkadasController(ArkadasService arkadasService, KullaniciService kullaniciService, JwtUtil jwtUtil) {
         this.arkadasService = arkadasService;
@@ -26,7 +28,6 @@ public class ArkadasController {
         this.jwtUtil = jwtUtil;
     }
 
-    // Mevcut arkadaşlık isteği gönderme (kullaniciId ile)
     @PostMapping("/istek")
     public Arkadas arkadasIsteğiGonder(@RequestParam Long gonderenId, @RequestParam Long alanId) {
         Kullanici gonderen = kullaniciService.kullaniciGetir(gonderenId);
@@ -34,7 +35,6 @@ public class ArkadasController {
         return arkadasService.arkadaslikIsteğiGonder(gonderen, alan);
     }
 
-    // Yeni arkadaş ekleme — frontend bu endpoint'i kullanacak
     @PostMapping
     public ArkadasDTO arkadasEkle(@RequestBody Map<String, String> body, @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
@@ -45,13 +45,15 @@ public class ArkadasController {
         Kullanici gonderen = kullaniciService.kullaniciGetir(gonderenId);
         Kullanici alan = kullaniciService.kullaniciGetirByKullaniciAdi(arkadasAdi);
 
-        Arkadas arkadas = arkadasService.arkadaslikIsteğiGonder(gonderen, alan);
+        arkadasService.arkadaslikIsteğiGonder(gonderen, alan);
+
         return new ArkadasDTO(alan.getId(), alan.getKullaniciAdi());
     }
 
     @PutMapping("/{id}/durum")
     public void arkadaslikDurumuGuncelle(@PathVariable Long id, @RequestParam int durum) {
-        arkadasService.arkadaslikDurumunuGuncelle(id, ArkadaslikDurumu.fromKod(durum));
+        ArkadaslikDurumu yeniDurum = ArkadaslikDurumu.fromKod(durum);
+        arkadasService.arkadaslikDurumunuGuncelle(id, yeniDurum);
     }
 
     @GetMapping("/liste")
@@ -67,6 +69,25 @@ public class ArkadasController {
                             : a.getIstekGonderen();
                     return new ArkadasDTO(diger.getId(), diger.getKullaniciAdi());
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
+
+    @GetMapping("/istekler")
+    public List<ArkadasIstekDTO> bekleyenArkadaslikIstekleri(@RequestParam Long alanId) {
+        Kullanici kullanici = kullaniciService.kullaniciGetir(alanId);
+        List<Arkadas> istekler = arkadasService.bekleyenIstekleriGetir(kullanici);
+
+        return istekler.stream()
+                .map(istek -> {
+                    Kullanici gonderen = istek.getIstekGonderen();
+                    String isimSoyisim = gonderen.getIsim() + " " + gonderen.getSoyisim();
+                    return new ArkadasIstekDTO(
+                            istek.getId(),
+                            gonderen.getKullaniciAdi(),
+                            isimSoyisim
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
 }
