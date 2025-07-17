@@ -6,6 +6,7 @@ import com.example.kullanici.model.Kullanici;
 import com.example.kullanici.repository.ArkadasRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -17,8 +18,22 @@ public class ArkadasService {
         this.arkadasRepository = arkadasRepository;
     }
 
-    // Arkadaşlık isteği gönder
+    // ✅ GÜNCEL — Arkadaşlık isteği gönder
     public Arkadas arkadaslikIsteğiGonder(Kullanici gonderen, Kullanici alan) {
+        List<Integer> kontrolEdilecekDurumlar = Arrays.asList(
+                ArkadaslikDurumu.BEKLIYOR.getKod(),
+                ArkadaslikDurumu.KABUL_EDILDI.getKod()
+        );
+
+        boolean zatenIliskiVar = arkadasRepository
+                .existsByIstekGonderenAndIstekAlanOrIstekGonderenAndIstekAlanAndDurumKodIn(
+                        gonderen, alan, alan, gonderen, kontrolEdilecekDurumlar
+                );
+
+        if (zatenIliskiVar) {
+            throw new IllegalStateException("Bu kullanıcıyla zaten arkadaşsınız veya isteğiniz beklemede.");
+        }
+
         Arkadas arkadas = new Arkadas();
         arkadas.setIstekGonderen(gonderen);
         arkadas.setIstekAlan(alan);
