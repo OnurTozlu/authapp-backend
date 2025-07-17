@@ -4,6 +4,7 @@ import com.example.kullanici.model.Kullanici;
 import com.example.kullanici.repository.KullaniciRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -39,5 +40,38 @@ public class KullaniciService {
 
     public boolean kullaniciVarMi(Long id) {
         return repository.existsById(id);
+    }
+
+    // ✅ Kullanıcı Güncelleme Metodu
+    public Kullanici kullaniciGuncelle(Long id, Map<String, Object> veri) {
+        Kullanici mevcut = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+
+        if (veri.containsKey("isim") && veri.get("isim") instanceof String) {
+            mevcut.setIsim((String) veri.get("isim"));
+        }
+        if (veri.containsKey("soyisim") && veri.get("soyisim") instanceof String) {
+            mevcut.setSoyisim((String) veri.get("soyisim"));
+        }
+        if (veri.containsKey("kullaniciAdi") && veri.get("kullaniciAdi") instanceof String) {
+            mevcut.setKullaniciAdi((String) veri.get("kullaniciAdi"));
+        }
+        if (veri.containsKey("mail") && veri.get("mail") instanceof String) {
+            mevcut.setMail((String) veri.get("mail"));
+        }
+        if (veri.containsKey("profilFotoUrl") && veri.get("profilFotoUrl") instanceof String) {
+            mevcut.setProfilFotoUrl((String) veri.get("profilFotoUrl"));
+        }
+
+        // Şifre boş değilse ve String ise güncelle
+        if (veri.containsKey("sifre") && veri.get("sifre") instanceof String) {
+            String sifre = ((String) veri.get("sifre")).trim();
+            if (!sifre.isEmpty()) {
+                // TODO: Şifreyi burada hash'leyin. Şimdilik direkt atılıyor.
+                mevcut.setSifre(sifre);
+            }
+        }
+
+        return repository.save(mevcut);
     }
 }

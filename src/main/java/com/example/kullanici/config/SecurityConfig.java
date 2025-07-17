@@ -37,12 +37,14 @@ public class SecurityConfig {
     ) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})
+                .cors(cors -> {})  // Cors ayarları bu satırla aktif ama ayar eklenmedi
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/kayit")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/giris")).permitAll()
-                        .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/me")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/auth/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/uploads/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/me")).authenticated()
+                        .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/*/uploadProfilFoto")).authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

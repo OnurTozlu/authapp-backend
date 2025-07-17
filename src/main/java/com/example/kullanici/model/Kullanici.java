@@ -27,6 +27,9 @@ public class Kullanici {
     @Column(length = 10, nullable = false, unique = true)
     private String numara;
 
+    private String profilFotoUrl;
+
+
 
     // Getter ve Setter'lar
 
@@ -86,4 +89,13 @@ public class Kullanici {
     public void setNumara(String numara) {
         this.numara = numara;
     }
+
+    public String getProfilFotoUrl() {
+        return profilFotoUrl;
+    }
+
+    public void setProfilFotoUrl(String profilFotoUrl) {
+        this.profilFotoUrl = profilFotoUrl;
+    }
+
 }
