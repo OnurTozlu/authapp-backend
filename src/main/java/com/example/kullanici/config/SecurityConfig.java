@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/kayit")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/giris")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/me")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/auth/**")).permitAll()
                         .anyRequest().authenticated()
                 )
