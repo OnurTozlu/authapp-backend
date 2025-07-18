@@ -1,7 +1,7 @@
 package com.example.kullanici.controller;
 
-import com.example.kullanici.DTO.ArkadasDTO;
-import com.example.kullanici.DTO.ArkadasIstekDTO;
+import com.example.kullanici.dto.ArkadasDTO;
+import com.example.kullanici.dto.ArkadasIstekDTO;
 import com.example.kullanici.model.Arkadas;
 import com.example.kullanici.model.ArkadaslikDurumu;
 import com.example.kullanici.model.Kullanici;

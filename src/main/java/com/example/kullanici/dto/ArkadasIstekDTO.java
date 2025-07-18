@@ -1,4 +1,4 @@
-package com.example.kullanici.DTO;
+package com.example.kullanici.dto;
 
 public class ArkadasIstekDTO {
     private Long istekId;
