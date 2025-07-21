@@ -1,42 +1,74 @@
 package com.example.kullanici.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
+@Entity
+@Table(name = "mesajlar")
 public class Mesaj {
-    private String senderId;
-    private String receiverId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "sender_id", nullable = false)
+    @JsonIgnore
+    private Kullanici sender;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "receiver_id", nullable = false)
+    @JsonIgnore
+    private Kullanici receiver;
+
+    @Column(name = "content", nullable = false, length = 2000)
     private String content;
-    private String timestamp;
 
-    public String getSenderId() {
-        return senderId;
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC);
+
+    @JsonProperty("id")
+    public Long getJsonId() {
+        return id;
     }
 
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
+    @JsonProperty("senderId")
+    public Long getJsonSenderId() {
+        return sender != null ? sender.getId() : null;
     }
 
-    public String getReceiverId() {
-        return receiverId;
+    @JsonProperty("receiverId")
+    public Long getJsonReceiverId() {
+        return receiver != null ? receiver.getId() : null;
     }
 
-    public void setReceiverId(String receiverId) {
-        this.receiverId = receiverId;
-    }
-
-    public String getContent() {
+    @JsonProperty("content")
+    public String getJsonContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    @JsonProperty("timestamp")
+    public String getJsonTimestamp() {
+        return createdAt != null ? createdAt.toString() : null;
     }
 
-    public String getTimestamp() {
-        return timestamp;
-    }
+    // Standart getter ve setterlar
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    // Getter ve Setter metodları (Otomatik oluşturabilirsin)
+    public Kullanici getSender() { return sender; }
+    public void setSender(Kullanici sender) { this.sender = sender; }
+
+    public Kullanici getReceiver() { return receiver; }
+    public void setReceiver(Kullanici receiver) { this.receiver = receiver; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
+    public OffsetDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
 }

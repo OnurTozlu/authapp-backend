@@ -45,6 +45,8 @@ public class SecurityConfig {
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/uploads/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/me")).authenticated()
                         .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/kullanici/*/uploadProfilFoto")).authenticated()
+                        .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/api/mesajlar/**")).authenticated()
+                        .requestMatchers(new MvcRequestMatcher(mvcHandlerMappingIntrospector, "/ws/**")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
