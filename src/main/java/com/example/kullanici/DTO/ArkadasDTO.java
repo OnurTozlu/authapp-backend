@@ -3,10 +3,12 @@ package com.example.kullanici.DTO;
 public class ArkadasDTO {
     private Long kullaniciId;
     private String kullaniciAdi;
+    private String profilFotoUrl;
 
-    public ArkadasDTO(Long kullaniciId, String kullaniciAdi) {
+    public ArkadasDTO(Long kullaniciId, String kullaniciAdi, String profilFotoUrl) {
         this.kullaniciId = kullaniciId;
         this.kullaniciAdi = kullaniciAdi;
+        this.profilFotoUrl = profilFotoUrl;
     }
 
     public Long getKullaniciId() {
@@ -24,4 +26,13 @@ public class ArkadasDTO {
     public void setKullaniciAdi(String kullaniciAdi) {
         this.kullaniciAdi = kullaniciAdi;
     }
+
+    public String getProfilFotoUrl() {
+        return profilFotoUrl;
+    }
+
+    public void setProfilFotoUrl(String profilFotoUrl) {
+        this.profilFotoUrl = profilFotoUrl;
+    }
+
 }

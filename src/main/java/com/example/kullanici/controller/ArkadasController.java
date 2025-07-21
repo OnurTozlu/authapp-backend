@@ -47,7 +47,7 @@ public class ArkadasController {
 
         arkadasService.arkadaslikIsteğiGonder(gonderen, alan);
 
-        return new ArkadasDTO(alan.getId(), alan.getKullaniciAdi());
+        return new ArkadasDTO(alan.getId(), alan.getKullaniciAdi(), alan.getProfilFotoUrl());
     }
 
     @PutMapping("/{id}/durum")
@@ -67,7 +67,7 @@ public class ArkadasController {
                     Kullanici diger = a.getIstekGonderen().getId().equals(kullaniciId)
                             ? a.getIstekAlan()
                             : a.getIstekGonderen();
-                    return new ArkadasDTO(diger.getId(), diger.getKullaniciAdi());
+                    return new ArkadasDTO(diger.getId(), diger.getKullaniciAdi(), diger.getProfilFotoUrl());
                 })
                 .collect(Collectors.toList());
     }
