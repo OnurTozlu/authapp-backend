@@ -114,17 +114,21 @@ public class MesajController {
                 .collect(Collectors.toList());
     }
 
-    // Entity’den DTO’ya dönüştürme metodu
     private MesajDTO toDTO(Mesaj mesaj) {
         MesajDTO dto = new MesajDTO();
         dto.setSenderId(mesaj.getSender().getId());
         dto.setReceiverId(mesaj.getReceiver().getId());
         dto.setContent(mesaj.getContent());
         dto.setTimestamp(mesaj.getCreatedAt().toString());
+
         dto.setSenderIsim(mesaj.getSender().getIsim());
         dto.setSenderSoyisim(mesaj.getSender().getSoyisim());
+
+        // Yeni eklenen alana da set edelim
         dto.setReceiverIsim(mesaj.getReceiver().getIsim());
         dto.setReceiverSoyisim(mesaj.getReceiver().getSoyisim());
+
         return dto;
     }
+
 }
