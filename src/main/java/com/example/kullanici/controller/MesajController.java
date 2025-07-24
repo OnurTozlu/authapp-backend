@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/mesajlar")
@@ -35,21 +36,17 @@ public class MesajController {
         this.kullaniciRepository = kullaniciRepository;
     }
 
-    // ✅ REST ile mesaj gönderme (Fallback için)
+    // REST ile mesaj gönderme (Fallback)
     @PostMapping
     public Mesaj mesajGonder(@RequestBody Mesaj mesaj) {
         return mesajKaydetVeGonder(mesaj);
     }
 
-    // ✅ WebSocket ile mesaj gönderme (Ana kanal)
+    // WebSocket ile mesaj gönderme
     @MessageMapping("/mesaj-gonder")
     public void mesajGonderWS(@Payload MesajDTO mesajDto, SimpMessageHeaderAccessor headerAccessor) {
-        if (mesajDto.getSenderId() == null) {
-            System.err.println("Hata: Gönderen ID eksik");
-            return;
-        }
-        if (mesajDto.getReceiverId() == null) {
-            System.err.println("Hata: Alıcı ID eksik");
+        if (mesajDto.getSenderId() == null || mesajDto.getReceiverId() == null) {
+            System.err.println("Hata: Gönderen veya Alıcı ID eksik");
             return;
         }
 
@@ -67,19 +64,18 @@ public class MesajController {
         Mesaj saved = mesajRepository.save(mesaj);
 
         System.out.println("WebSocket mesajı alındı: " + mesaj.getContent());
-        System.out.println("Gönderen ID: " + sender.getId());
-        System.out.println("Alıcı ID: " + receiver.getId());
+
+        // DTO'ya isim-soyisim set et (Gönderen ve Alıcı)
+        MesajDTO responseDto = toDTO(saved);
 
         messagingTemplate.convertAndSendToUser(
                 String.valueOf(saved.getReceiver().getId()),
                 "/queue/mesajlar",
-                saved
+                responseDto
         );
     }
 
-
-
-    // 🔁 Ortak mesaj kaydetme ve gönderme metodu
+    // Mesaj kaydet ve WebSocket ile gönder
     private Mesaj mesajKaydetVeGonder(Mesaj mesaj) {
         Kullanici sender = kullaniciRepository.findById(mesaj.getSender().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Gönderen bulunamadı"));
@@ -92,24 +88,43 @@ public class MesajController {
 
         Mesaj saved = mesajRepository.save(mesaj);
 
-        // WebSocket üzerinden alıcıya gönder
+        // WebSocket üzerinden alıcıya DTO olarak gönder
         messagingTemplate.convertAndSendToUser(
                 String.valueOf(saved.getReceiver().getId()),
                 "/queue/mesajlar",
-                saved
+                toDTO(saved)
         );
 
         return saved;
     }
 
-    // ✅ Mesaj geçmişi alma
+    // Mesaj geçmişini DTO listesi olarak döndür
     @GetMapping
-    public List<Mesaj> mesajlariGetir(Authentication authentication, @RequestParam Long aliciId) {
+    public List<MesajDTO> mesajlariGetir(Authentication authentication, @RequestParam Long aliciId) {
         String username = authentication.getName();
 
         Kullanici kullanici = kullaniciRepository.findByKullaniciAdi(username)
                 .orElseThrow(() -> new IllegalArgumentException("Kullanıcı bulunamadı"));
 
-        return mesajRepository.findChatMessagesBetweenUsers(kullanici.getId(), aliciId);
+        List<Mesaj> mesajlar = mesajRepository.findChatMessagesBetweenUsers(kullanici.getId(), aliciId);
+
+        // Mesajları DTO’ya dönüştür
+        return mesajlar.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Entity’den DTO’ya dönüştürme metodu
+    private MesajDTO toDTO(Mesaj mesaj) {
+        MesajDTO dto = new MesajDTO();
+        dto.setSenderId(mesaj.getSender().getId());
+        dto.setReceiverId(mesaj.getReceiver().getId());
+        dto.setContent(mesaj.getContent());
+        dto.setTimestamp(mesaj.getCreatedAt().toString());
+        dto.setSenderIsim(mesaj.getSender().getIsim());
+        dto.setSenderSoyisim(mesaj.getSender().getSoyisim());
+        dto.setReceiverIsim(mesaj.getReceiver().getIsim());
+        dto.setReceiverSoyisim(mesaj.getReceiver().getSoyisim());
+        return dto;
     }
 }
